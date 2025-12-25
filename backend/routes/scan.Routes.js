@@ -3,6 +3,11 @@ import { runEvilScan } from "../runners/evilscanRunner.js";
 
 const router = express.Router();
 
+/**
+ * POST /api/scan/network
+ * Network scanning endpoint for mobile and web clients
+ * Mobile-friendly: Consistent response format with proper error codes
+ */
 router.post("/network", async (req, res) => {
   try {
     const { ips, ports } = req.body;
@@ -12,7 +17,8 @@ router.post("/network", async (req, res) => {
     if (!ips || !ports) {
       return res.status(400).json({ 
         success: false, 
-        error: 'IPs and ports are required' 
+        error: 'IPs and ports are required',
+        code: 'MISSING_PARAMETERS'
       });
     }
     
@@ -25,12 +31,20 @@ router.post("/network", async (req, res) => {
     
     console.log(`Scan complete. Found ${results.length} results`);
     
-    res.json({ success: true, results });
+    res.json({ 
+      success: true, 
+      data: {
+        results,
+        count: results.length,
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (err) {
     console.error('Scan error:', err);
     res.status(500).json({ 
       success: false, 
-      error: err.message || 'Scan failed' 
+      error: err.message || 'Scan failed',
+      code: 'SCAN_ERROR'
     });
   }
 });

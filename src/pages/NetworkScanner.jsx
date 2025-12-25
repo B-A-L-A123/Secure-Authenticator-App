@@ -32,7 +32,8 @@ export default function NetworkScanner() {
       const data = await response.json();
       
       if (data.success) {
-        setResults(data.results || []);
+        // Updated to match new backend response format
+        setResults(data.data?.results || []);
       } else {
         throw new Error(data.error || 'Scan failed');
       }
