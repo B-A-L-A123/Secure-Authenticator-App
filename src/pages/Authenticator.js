@@ -434,7 +434,7 @@ function base32Decode(base32) {
   }
   const bytes = [];
   for (let i = 0; i + 8 <= bits.length; i += 8) {
-    bytes.push(parseInt(bits.substr(i, 8), 2));
+    bytes.push(parseInt(bits.slice(i, i + 8), 2));
   }
   return new Uint8Array(bytes);
 }
@@ -557,7 +557,7 @@ function concat(a, b) {
 function hexToBytes(hex) {
   const bytes = [];
   for (let i = 0; i < hex.length; i += 2) {
-    bytes.push(parseInt(hex.substr(i, 2), 16));
+    bytes.push(parseInt(hex.slice(i, i + 2), 16));
   }
   return new Uint8Array(bytes);
 }

@@ -44,3 +44,8 @@ ios/
 
 # CocoaPods
 /ios/Pods/
+
+# Environment and config
+config.js
+.env
+.env.local

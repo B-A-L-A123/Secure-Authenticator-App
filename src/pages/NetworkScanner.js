@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { CONFIG } from '../../config';
 
 // Use environment variable or fallback to localhost:3001
-const API_URL = 'http://localhost:3001';
+const API_URL = CONFIG.API_URL;
 
 export default function NetworkScanner() {
   const [scanning, setScanning] = useState(false);

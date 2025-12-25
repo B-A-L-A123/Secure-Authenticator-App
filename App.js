@@ -8,12 +8,15 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-goo
 import Authenticator from './src/pages/Authenticator';
 import WebsiteCheck from './src/pages/Websitecheck';
 import NetworkScanner from './src/pages/NetworkScanner';
+import { CONFIG } from './config';
 
 const Tab = createBottomTabNavigator();
 
 // Configure Google Sign-In
 GoogleSignin.configure({
-  webClientId: '356401180182-kou09gidb49a45708i62qadvf2t4grcl.apps.googleusercontent.com',
+  webClientId: CONFIG.GOOGLE_WEB_CLIENT_ID,
+  iosClientId: CONFIG.GOOGLE_IOS_CLIENT_ID,
+  androidClientId: CONFIG.GOOGLE_ANDROID_CLIENT_ID,
 });
 
 function App() {

@@ -69,21 +69,30 @@ cd ..
 
 ### 4. Configure Google Sign-In
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable Google Sign-In API
-4. Create OAuth 2.0 credentials:
+1. Copy the example config file:
+```bash
+cp config.example.js config.js
+```
+
+2. Go to [Google Cloud Console](https://console.cloud.google.com/)
+3. Create a new project or select existing
+4. Enable Google Sign-In API
+5. Create OAuth 2.0 credentials:
    - **Web Client ID**: For authentication
    - **iOS Client ID**: For iOS app
    - **Android Client ID**: For Android app
 
-5. Update the configuration in `App.js`:
+6. Update `config.js` with your credentials:
 ```javascript
-GoogleSignin.configure({
-  webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
-  iosClientId: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com', // iOS only
-});
+export const CONFIG = {
+  GOOGLE_WEB_CLIENT_ID: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+  GOOGLE_IOS_CLIENT_ID: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
+  GOOGLE_ANDROID_CLIENT_ID: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com',
+  // ...
+};
 ```
+
+**Note**: Never commit `config.js` to version control. It's included in `.gitignore`.
 
 ### 5. Configure Camera Permissions
 
