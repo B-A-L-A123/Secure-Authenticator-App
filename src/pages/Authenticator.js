@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Clipboard from '@react-native-community/clipboard';
 import { Camera, useCameraDevices, useCodeScanner } from 'react-native-vision-camera';
 
 export default function Authenticator() {
@@ -194,9 +195,7 @@ function AccountCard({ id, name, email, secret, timeLeft, onDelete }) {
   const [copied, setCopied] = useState(false);
 
   const copyCode = async () => {
-    // Note: In React Native, you'll need to use Clipboard API
-    // import Clipboard from '@react-native-clipboard/clipboard';
-    // Clipboard.setString(code);
+    Clipboard.setString(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
