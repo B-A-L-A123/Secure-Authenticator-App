@@ -46,8 +46,14 @@ const corsOptions = {
     if (isAllowed) {
       callback(null, true);
     } else {
-      console.warn(`CORS: Blocked request from origin: ${origin}`);
-      callback(null, true); // Still allow for development - adjust for production
+      // In development, log warning but allow; in production, block
+      if (process.env.NODE_ENV === 'production') {
+        console.error(`CORS: Blocked request from unauthorized origin: ${origin}`);
+        callback(new Error('Origin not allowed by CORS'), false);
+      } else {
+        console.warn(`CORS: Origin ${origin} not in allowed list, but allowing for development`);
+        callback(null, true);
+      }
     }
   },
   credentials: true,
@@ -204,13 +210,15 @@ app.post('/api/generate-token', (req, res) => {
     });
 
     const timeRemaining = 30 - Math.floor((Date.now() / 1000) % 30);
+    const currentTime = Date.now();
 
     res.json({
       success: true,
       data: {
         token: token,
         timeRemaining: timeRemaining,
-        expiresAt: Date.now() + (timeRemaining * 1000)
+        // Time when the current token expires and a new one will be generated
+        expiresAt: currentTime + (timeRemaining * 1000)
       }
     });
 
@@ -296,12 +304,18 @@ app.get('/api/health', (req, res) => {
 // Global error handler for unhandled errors
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  res.status(err.status || 500).json({
+  const response = {
     success: false,
     error: err.message || 'Internal server error',
-    code: err.code || 'INTERNAL_ERROR',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+    code: err.code || 'INTERNAL_ERROR'
+  };
+  
+  // Only expose stack traces in development mode
+  if (process.env.NODE_ENV === 'development') {
+    response.stack = err.stack;
+  }
+  
+  res.status(err.status || 500).json(response);
 });
 
 // 404 handler
