@@ -1,0 +1,13 @@
+{
+  "name": "SecureAuthenticator",
+  "displayName": "Secure Authenticator",
+  "expo": {
+    "name": "SecureAuthenticator",
+    "slug": "secure-authenticator",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  }
+}
