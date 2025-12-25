@@ -36,7 +36,11 @@ const corsOptions = {
       // Pattern matching for React Native/Expo development
       // exp://, exps://, http://localhost:*, http://192.168.*
       if (allowed.includes('*')) {
-        const pattern = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
+        // Escape special regex characters except for our wildcard
+        const escapedPattern = allowed
+          .replace(/[.+?^${}()|[\]\\]/g, '\\$&')  // Escape special chars
+          .replace(/\*/g, '.*');  // Convert * to .*
+        const pattern = new RegExp('^' + escapedPattern + '$');
         return pattern.test(origin);
       }
       
@@ -65,8 +69,8 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' })); // Increased limit for QR codes
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '2mb' })); // Limit for QR codes (reduced from 10mb for security)
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // Request logging middleware for debugging mobile requests
 app.use((req, res, next) => {
@@ -84,11 +88,14 @@ const users = new Map();
 /**
  * Helper function to sanitize error messages for production
  * Only exposes detailed error messages in development mode
+ * Defaults to hiding error details for security
  */
 function sanitizeErrorMessage(error, defaultMessage) {
+  // Only show detailed errors explicitly in development mode
   if (process.env.NODE_ENV === 'development') {
     return error.message || defaultMessage;
   }
+  // Default to hiding error details for security
   return defaultMessage;
 }
 
@@ -112,7 +119,7 @@ app.post('/api/setup', async (req, res) => {
     // Generate secret
     const secret = speakeasy.generateSecret({
       name: name || `Authenticator (${email})`,
-      issuer: 'MyAuthApp'
+      issuer: process.env.APP_ISSUER || 'MyAuthApp'
     });
 
     // Generate QR code
