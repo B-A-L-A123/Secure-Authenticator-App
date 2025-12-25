@@ -82,6 +82,17 @@ app.use("/api/scan", scanRoutes);
 const users = new Map();
 
 /**
+ * Helper function to sanitize error messages for production
+ * Only exposes detailed error messages in development mode
+ */
+function sanitizeErrorMessage(error, defaultMessage) {
+  if (process.env.NODE_ENV === 'development') {
+    return error.message || defaultMessage;
+  }
+  return defaultMessage;
+}
+
+/**
  * POST /api/setup
  * Generate a new secret and QR code for 2FA setup
  * Mobile-friendly: Returns both QR code data URL and OTP auth URL
@@ -129,7 +140,7 @@ app.post('/api/setup', async (req, res) => {
       success: false,
       error: 'Failed to generate QR code',
       code: 'SETUP_ERROR',
-      message: error.message
+      message: sanitizeErrorMessage(error, 'Failed to generate QR code')
     });
   }
 });
@@ -182,7 +193,7 @@ app.post('/api/verify', (req, res) => {
       success: false,
       error: 'Verification failed',
       code: 'VERIFICATION_ERROR',
-      message: error.message
+      message: sanitizeErrorMessage(error, 'Verification failed')
     });
   }
 });
@@ -210,7 +221,6 @@ app.post('/api/generate-token', (req, res) => {
     });
 
     const timeRemaining = 30 - Math.floor((Date.now() / 1000) % 30);
-    const currentTime = Date.now();
 
     res.json({
       success: true,
@@ -218,7 +228,7 @@ app.post('/api/generate-token', (req, res) => {
         token: token,
         timeRemaining: timeRemaining,
         // Time when the current token expires and a new one will be generated
-        expiresAt: currentTime + (timeRemaining * 1000)
+        expiresAt: Date.now() + (timeRemaining * 1000)
       }
     });
 
@@ -228,7 +238,7 @@ app.post('/api/generate-token', (req, res) => {
       success: false,
       error: 'Failed to generate token',
       code: 'TOKEN_GENERATION_ERROR',
-      message: error.message
+      message: sanitizeErrorMessage(error, 'Failed to generate token')
     });
   }
 });
@@ -268,7 +278,7 @@ app.get('/api/validate-secret', (req, res) => {
       success: false,
       error: 'Validation failed',
       code: 'VALIDATION_ERROR',
-      message: error.message
+      message: sanitizeErrorMessage(error, 'Validation failed')
     });
   }
 });
