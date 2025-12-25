@@ -7,6 +7,50 @@ export default function WebsiteCheck() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scanType, setScanType] = useState('deep'); // 'quick' or 'deep'
 
+  // Security patterns for threat detection
+  const SECURITY_PATTERNS = {
+    KEYLOGGER: [
+      /addEventListener\s*\(\s*['"]keydown['"]/gi,
+      /addEventListener\s*\(\s*['"]keypress['"]/gi,
+      /addEventListener\s*\(\s*['"]keyup['"]/gi,
+      /onkeydown\s*=/gi,
+      /onkeypress\s*=/gi,
+      /onkeyup\s*=/gi,
+      /document\.onkey/gi,
+      /KeyboardEvent/gi,
+      /captureKeys/gi,
+      /logKeys/gi,
+      /keystroke/gi,
+    ],
+    SPYWARE: [
+      /fetch\s*\(\s*['"][^'"]*track/gi,
+      /XMLHttpRequest/gi,
+      /navigator\.geolocation/gi,
+      /getUserMedia/gi,
+      /screen\.width/gi,
+      /screen\.height/gi,
+      /navigator\.userAgent/gi,
+      /localStorage\.setItem/gi,
+      /sessionStorage\.setItem/gi,
+      /document\.cookie/gi,
+      /track(ing|er|Event)/gi,
+      /analytics/gi,
+      /pixel/gi,
+    ],
+    MALICIOUS: [
+      /eval\s*\(/gi,
+      /Function\s*\(/gi,
+      /exec\s*\(/gi,
+      /innerHTML\s*=/gi,
+      /document\.write/gi,
+      /fromCharCode/gi,
+      /atob\s*\(/gi,
+      /btoa\s*\(/gi,
+      /unescape/gi,
+      /\.createElement\s*\(\s*['"]script['"]/gi,
+    ],
+  };
+
   // Deep scan - fetches actual website content
   const deepScanWebsite = async (urlString) => {
     const threats = [];
@@ -36,22 +80,8 @@ export default function WebsiteCheck() {
       }
 
       if (fetchSuccess && htmlContent) {
-        const keyloggerPatterns = [
-          /addEventListener\s*\(\s*['"]keydown['"]/gi,
-          /addEventListener\s*\(\s*['"]keypress['"]/gi,
-          /addEventListener\s*\(\s*['"]keyup['"]/gi,
-          /onkeydown\s*=/gi,
-          /onkeypress\s*=/gi,
-          /onkeyup\s*=/gi,
-          /document\.onkey/gi,
-          /KeyboardEvent/gi,
-          /captureKeys/gi,
-          /logKeys/gi,
-          /keystroke/gi,
-        ];
-
         let keyloggerScore = 0;
-        keyloggerPatterns.forEach((pattern) => {
+        SECURITY_PATTERNS.KEYLOGGER.forEach((pattern) => {
           const matches = htmlContent.match(pattern);
           if (matches) {
             keyloggerScore += matches.length;
@@ -66,24 +96,8 @@ export default function WebsiteCheck() {
           if (risk === 'Low Risk') risk = 'Moderate Risk';
         }
 
-        const spywarePatterns = [
-          /fetch\s*\(\s*['"][^'"]*track/gi,
-          /XMLHttpRequest/gi,
-          /navigator\.geolocation/gi,
-          /getUserMedia/gi,
-          /screen\.width/gi,
-          /screen\.height/gi,
-          /navigator\.userAgent/gi,
-          /localStorage\.setItem/gi,
-          /sessionStorage\.setItem/gi,
-          /document\.cookie/gi,
-          /track(ing|er|Event)/gi,
-          /analytics/gi,
-          /pixel/gi,
-        ];
-
         let spywareScore = 0;
-        spywarePatterns.forEach((pattern) => {
+        SECURITY_PATTERNS.SPYWARE.forEach((pattern) => {
           const matches = htmlContent.match(pattern);
           if (matches) {
             spywareScore += matches.length;
@@ -98,21 +112,8 @@ export default function WebsiteCheck() {
           if (risk === 'Low Risk') risk = 'Moderate Risk';
         }
 
-        const maliciousPatterns = [
-          /eval\s*\(/gi,
-          /Function\s*\(/gi,
-          /exec\s*\(/gi,
-          /innerHTML\s*=/gi,
-          /document\.write/gi,
-          /fromCharCode/gi,
-          /atob\s*\(/gi,
-          /btoa\s*\(/gi,
-          /unescape/gi,
-          /\.createElement\s*\(\s*['"]script['"]/gi,
-        ];
-
         let maliciousScore = 0;
-        maliciousPatterns.forEach((pattern) => {
+        SECURITY_PATTERNS.MALICIOUS.forEach((pattern) => {
           const matches = htmlContent.match(pattern);
           if (matches) {
             maliciousScore += matches.length;
