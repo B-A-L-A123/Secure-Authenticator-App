@@ -6,13 +6,6 @@
 echo "🚀 Setting up React Native Native Code..."
 echo ""
 
-# Check if React Native CLI is installed
-if ! command -v react-native &> /dev/null
-then
-    echo "❌ React Native CLI not found. Installing..."
-    npm install -g react-native-cli
-fi
-
 echo "📱 Initializing native projects..."
 echo ""
 echo "This will generate the iOS and Android native code directories."
@@ -20,7 +13,7 @@ echo ""
 
 # Option 1: Use React Native CLI to generate native code
 echo "Option 1: Generate native code with React Native CLI"
-echo "  npx react-native init SecureAuthenticatorTemp --template react-native-template-typescript"
+echo "  npx @react-native-community/cli init SecureAuthenticatorTemp"
 echo "  Then copy the 'android' and 'ios' folders to this project"
 echo ""
 
@@ -34,7 +27,7 @@ echo ""
 echo "✨ Recommended approach:"
 echo ""
 echo "1. Backup your current source files"
-echo "2. Run: npx react-native init SecureAuthenticatorNative"
+echo "2. Run: npx @react-native-community/cli init SecureAuthenticatorNative"
 echo "3. Copy the following from SecureAuthenticatorNative to this project:"
 echo "   - android/ directory"
 echo "   - ios/ directory"
@@ -47,7 +40,7 @@ echo "📝 After setup, remember to:"
 echo "  - Configure Google Sign-In credentials"
 echo "  - Update Info.plist (iOS) for camera permissions"
 echo "  - Update AndroidManifest.xml (Android) for camera permissions"
-echo "  - Link native dependencies: npx react-native link"
+echo "  - Native modules will auto-link automatically (React Native 0.60+)"
 echo ""
 
 echo "For iOS:"
