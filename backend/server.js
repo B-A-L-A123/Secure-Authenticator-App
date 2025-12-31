@@ -1,13 +1,13 @@
 // server.js - Backend for 2FA Authenticator App
-// Install dependencies: npm install express cors speakeasy qrcode
-
 import express from 'express';
 import cors from 'cors';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import scanRoutes from "./routes/scan.Routes.js";
+import { setupAuthenticator, verifyOTP } from './authController.js';
 
 const app = express();
+// Elastic Beanstalk uses port 8080, fallback to 3001 for local dev
 const PORT = process.env.PORT || 3001;
 
 // Middleware
@@ -30,26 +30,19 @@ app.post('/api/setup', async (req, res) => {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    // Generate secret
-    const secret = speakeasy.generateSecret({
-      name: name || `Authenticator (${email})`,
-      issuer: 'MyAuthApp'
-    });
-
-    // Generate QR code
-    const qrCodeDataUrl = await QRCode.toDataURL(secret.otpauth_url);
+    // Use the controller function
+    const result = await setupAuthenticator(email);
 
     // Store user secret (in production, save to database)
     users.set(email, {
-      secret: secret.base32,
-      tempSecret: secret.base32,
+      secret: result.secret,
+      tempSecret: result.secret,
       verified: false
     });
 
     res.json({
-      qrCode: qrCodeDataUrl,
-      manualKey: secret.base32,
-      otpauth_url: secret.otpauth_url
+      qrCode: result.qrCode,
+      manualKey: result.secret
     });
 
   } catch (error) {
@@ -70,13 +63,8 @@ app.post('/api/verify', (req, res) => {
       return res.status(400).json({ error: 'Token and secret are required' });
     }
 
-    // Verify the token
-    const verified = speakeasy.totp.verify({
-      secret: secret,
-      encoding: 'base32',
-      token: token,
-      window: 2 // Allow 2 time steps before/after for clock skew
-    });
+    // Use the controller function
+    const verified = verifyOTP(secret, token);
 
     if (verified && email && users.has(email)) {
       // Mark user as verified
@@ -156,6 +144,17 @@ app.get('/api/validate-secret', (req, res) => {
 });
 
 /**
+ * Root endpoint - for EB health checks
+ */
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Authenticator API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
  * Health check endpoint
  */
 app.get('/api/health', (req, res) => {
@@ -174,7 +173,6 @@ app.listen(PORT, () => {
   console.log(`   POST http://localhost:${PORT}/api/verify`);
   console.log(`   POST http://localhost:${PORT}/api/generate-token`);
   console.log(`   GET  http://localhost:${PORT}/api/health`);
-   
 });
 
 export default app;

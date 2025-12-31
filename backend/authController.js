@@ -1,8 +1,8 @@
-const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
 
 // 1. GENERATE A NEW SECRET (Triggered when user clicks "Scan QR")
-const setupAuthenticator = async (userEmail) => {
+export const setupAuthenticator = async (userEmail) => {
   // Generate a unique secret for this user
   const secret = speakeasy.generateSecret({
     name: `SecureSuite (${userEmail})`,
@@ -19,7 +19,7 @@ const setupAuthenticator = async (userEmail) => {
 };
 
 // 2. GENERATE / VERIFY CODE (Check if the code the user typed is correct)
-const verifyOTP = (userSecret, userTypedCode) => {
+export const verifyOTP = (userSecret, userTypedCode) => {
   const verified = speakeasy.totp.verify({
     secret: userSecret,
     encoding: 'base32',

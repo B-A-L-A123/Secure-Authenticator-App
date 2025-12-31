@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 // Use environment variable or fallback to localhost:3001
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = 'http://authentictor-app-env.eba-xyyj56h2.us-east-1.elasticbeanstalk.com';
+
 
 export default function NetworkScanner() {
   const [scanning, setScanning] = useState(false);
