@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // Use environment variable or fallback to localhost:3001
-const API_URL = 'http://authentictor-app-env.eba-xyyj56h2.us-east-1.elasticbeanstalk.com';
+const API_URL = 'https://authenticator-api.balajikbalaji03.workers.dev';
 
 
 export default function NetworkScanner() {
